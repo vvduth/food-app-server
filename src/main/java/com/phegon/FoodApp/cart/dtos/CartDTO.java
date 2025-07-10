@@ -9,7 +9,7 @@ import lombok.Data;
 import java.math.BigDecimal;
 import java.util.List;
 
-
+// DTO is a Data Transfer Object that represents the Cart entity. use to transfer data between the application and the client.
 @Data
 @JsonInclude(JsonInclude.Include.NON_NULL)
 @JsonIgnoreProperties(ignoreUnknown = true)

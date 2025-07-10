@@ -8,7 +8,7 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 
 import java.math.BigDecimal;
-
+// cart entity, entity is a class that represents a table in the database.
 @Entity
 @Data
 @Table(name = "cart_item")
