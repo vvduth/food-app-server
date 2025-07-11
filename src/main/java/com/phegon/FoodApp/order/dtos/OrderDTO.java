@@ -2,6 +2,7 @@ package com.phegon.FoodApp.order.dtos;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonInclude;
+import com.phegon.FoodApp.auth_users.dtos.UserDto;
 import com.phegon.FoodApp.enums.OrderStatus;
 import com.phegon.FoodApp.enums.PaymentStatus;
 import lombok.Data;
@@ -25,7 +26,7 @@ public class OrderDTO {
 
     private PaymentStatus paymentStatus;
 
-    private UserDTO user;
+    private UserDto user;
 
     private List<OrderItemDTO> orderItems;
 }
