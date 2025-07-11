@@ -27,7 +27,7 @@ public class NotificationDTO {
 
     private NotificationType type;
 
-    private final LocalDateTime createdAt;
+    private LocalDateTime createdAt;
 
     private boolean isHtml;
 

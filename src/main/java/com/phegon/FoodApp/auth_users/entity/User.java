@@ -1,6 +1,10 @@
 package com.phegon.FoodApp.auth_users.entity;
 
 import com.phegon.FoodApp.cart.entity.Cart;
+import com.phegon.FoodApp.order.entity.Order;
+import com.phegon.FoodApp.payment.entity.Payment;
+import com.phegon.FoodApp.review.entity.Review;
+import com.phegon.FoodApp.role.entity.Role;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotBlank;
 import lombok.AllArgsConstructor;
@@ -36,7 +40,7 @@ public class User {
 
     private String address;
 
-    private String isActive;
+    private boolean isActive;
 
     @ManyToMany(fetch = FetchType.EAGER)
     @JoinTable(
