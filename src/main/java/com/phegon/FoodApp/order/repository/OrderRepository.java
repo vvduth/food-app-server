@@ -13,7 +13,7 @@ import java.util.List;
 public interface OrderRepository extends JpaRepository<Order, Long> {
     Page<Order> findByOrderStatus(OrderStatus orderStatus, Pageable pageable);
 
-    List<Order> findByUserIdOrderByDateDesc(User user);
+    List<Order> findByUserOrderByOrderDateDesc(User user);
 
     // this query counts the total number of distinct users who have placed orders
     @Query("SELECT COUNT(DISTINCT o.user.id) FROM Order o")

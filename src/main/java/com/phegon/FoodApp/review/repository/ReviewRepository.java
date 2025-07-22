@@ -14,11 +14,10 @@ public interface ReviewRepository extends JpaRepository<Review, Long> {
     Double calculateAverageRatingByMenuId(@Param("menuId") Long menuId);
 
     @Query("SELECT CASE WHEN COUNT(r) > 0 THEN true ELSE false END " +
-           "FROM Review r " +
-           "WHERE r.user.id = :userId AND r.menu.id = :menuId AND r.order.id = :orderId")
+            "FROM Review r " +
+            "WHERE r.user.id = :userId AND r.menu.id = :menuId AND r.orderId = :orderId")
     boolean existsByUserIdAndMenuIdAndOrderId(
             @Param("userId") Long userId,
             @Param("menuId") Long menuId,
-            @Param("orderId") Long orderId
-    );
+            @Param("orderId") Long orderId);
 }
