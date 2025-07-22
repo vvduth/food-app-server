@@ -1,4 +1,4 @@
-package com.phegon.FoodApp.auth_users;
+package com.phegon.FoodApp.auth_users.services;
 
 
 import com.phegon.FoodApp.auth_users.dtos.LoginRequest;
@@ -77,7 +77,7 @@ public class AuthServiceImpl implements AuthService {
     }
 
     @Override
-    public Response<?> login(LoginRequest loginRequest) {
+    public Response<LoginResponse> login(LoginRequest loginRequest) {
 
         log.info("Logging in user: {}", loginRequest.getEmail());
 
@@ -102,7 +102,7 @@ public class AuthServiceImpl implements AuthService {
         LoginResponse loginResponse = new LoginResponse();
         loginResponse.setToken(token);
         loginResponse.setRoles(roleNames);
-        return Response.builder()
+        return Response.<LoginResponse>builder()
                 .statusCode(HttpStatus.OK.value())
                 .message("Login successful")
                 .data(loginResponse)
