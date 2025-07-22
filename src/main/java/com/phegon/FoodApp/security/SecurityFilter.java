@@ -37,8 +37,9 @@ public class SecurityFilter {
                                 .accessDeniedHandler(customAccessDenialHandler)
                                 .authenticationEntryPoint(customAuthenticationEntryPoint)
 
-                ).authorizeHttpRequests(req-> req.requestMatchers("/api/auth/**", "/api/categories/**",
-                                "/api/menu/**", "/api/reviews/**","/api/v1/aws/upload")
+                ).authorizeHttpRequests(req-> req.requestMatchers("/api/v1/auth/**", "/api/v1/categories/**",
+                                "/api/v1/menu/**", "/api/v1/reviews/**","/api/v1/aws/upload",
+                                "/api/v1/roles/**")
                         .permitAll()
                         .anyRequest().authenticated())
                 .sessionManagement(mag -> mag.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
