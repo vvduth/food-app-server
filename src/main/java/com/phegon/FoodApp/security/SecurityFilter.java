@@ -38,7 +38,7 @@ public class SecurityFilter {
                                 .authenticationEntryPoint(customAuthenticationEntryPoint)
 
                 ).authorizeHttpRequests(req-> req.requestMatchers("/api/auth/**", "/api/categories/**",
-                                "/api/menu/**", "/api/reviews/**")
+                                "/api/menu/**", "/api/reviews/**","/api/v1/aws/upload")
                         .permitAll()
                         .anyRequest().authenticated())
                 .sessionManagement(mag -> mag.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
