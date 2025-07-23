@@ -108,11 +108,13 @@ public class UserServiceImpl implements UserService{
             user.setPassword(passwordEncoder.encode(userDTO.getPassword()));
         }
         if (userDTO.getEmail() != null && !userDTO.getEmail().equals(user.getEmail())) {
+            // Check if the new email is already taken
             if (userRepository.existsByEmail(userDTO.getEmail())) {
                 throw new BadRequestException("Email already exists");
             }
+            user.setEmail(userDTO.getEmail());
         }
-        user.setEmail(userDTO.getEmail());
+
 
         // save updated user
         userRepository.save(user);
