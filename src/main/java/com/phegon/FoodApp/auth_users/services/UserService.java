@@ -12,6 +12,6 @@ public interface UserService {
     Response<List<UserDto>> getAllUsers();
     Response<UserDto> getOwnAccountDetails();
 
-    Response<?> updateOwnAccount();
+    Response<?> updateOwnAccount(UserDto userDto);
     Response<?> deactivateOwnAccount();
 }

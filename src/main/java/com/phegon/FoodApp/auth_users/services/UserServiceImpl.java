@@ -4,7 +4,9 @@ import com.phegon.FoodApp.auth_users.dtos.UserDto;
 import com.phegon.FoodApp.auth_users.entity.User;
 import com.phegon.FoodApp.auth_users.repository.UserRepository;
 import com.phegon.FoodApp.aws.AWSS3Service;
+import com.phegon.FoodApp.email_notification.dtos.NotificationDTO;
 import com.phegon.FoodApp.email_notification.services.NotificationService;
+import com.phegon.FoodApp.exceptions.BadRequestException;
 import com.phegon.FoodApp.exceptions.NotFoundException;
 import com.phegon.FoodApp.response.Response;
 import lombok.RequiredArgsConstructor;
@@ -16,8 +18,11 @@ import org.springframework.http.HttpStatus;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
+import org.springframework.web.multipart.MultipartFile;
 
+import java.net.URL;
 import java.util.List;
+import java.util.UUID;
 
 @Service
 @RequiredArgsConstructor
@@ -66,12 +71,82 @@ public class UserServiceImpl implements UserService{
     }
 
     @Override
-    public Response<?> updateOwnAccount() {
-        return null;
+    public Response<?> updateOwnAccount(UserDto userDTO) {
+        log.info("Updating own account for user: {}", getCurrentLoggedInUser().getEmail());
+        // fetch current logged-in user
+        User user = getCurrentLoggedInUser();
+
+        String profileUrl = user.getProfileUrl();
+
+        MultipartFile imageFile = userDTO.getImageFile();
+
+        // check if new image file was provided
+        if (imageFile != null && !imageFile.isEmpty()) {
+            // delete old image from S3 if ti exists
+            if (profileUrl != null  && !profileUrl.isEmpty()) {
+                String keyName = profileUrl.substring(profileUrl.lastIndexOf("/") + 1);
+                awss3Service.deleteFile("profile/"+ keyName);
+                log.info("Deleted old profile image from S3: {}", keyName);
+            }
+            // upload new image to S3
+            String imageName = UUID.randomUUID().toString() + "_" + imageFile.getOriginalFilename();
+            URL newImageUrl = awss3Service.uploadFile("profile/" + imageName, imageFile);
+            user.setProfileUrl(newImageUrl.toString());
+        }
+
+        // update user details
+        if ( userDTO.getName() != null){
+            user.setName(userDTO.getName());
+        }
+        if (userDTO.getPhoneNumber() != null) {
+            user.setPhoneNumber(userDTO.getPhoneNumber());
+        }
+        if (userDTO.getAddress() != null) {
+            user.setEmail(userDTO.getAddress());
+        }
+        if (userDTO.getPassword() != null) {
+            user.setPassword(passwordEncoder.encode(userDTO.getPassword()));
+        }
+        if (userDTO.getEmail() != null && !userDTO.getEmail().equals(user.getEmail())) {
+            if (userRepository.existsByEmail(userDTO.getEmail())) {
+                throw new BadRequestException("Email already exists");
+            }
+        }
+        user.setEmail(userDTO.getEmail());
+
+        // save updated user
+        userRepository.save(user);
+
+        return Response.builder()
+                .statusCode(HttpStatus.OK.value())
+                .message("Own account updated successfully")
+                .data(modelMapper.map(user, UserDto.class))
+                .build();
     }
 
     @Override
     public Response<?> deactivateOwnAccount() {
-        return null;
+        log.info("Deactivating own account for user: {}", getCurrentLoggedInUser().getEmail());
+        User user = getCurrentLoggedInUser();
+
+        // deactivate user
+        user.setActive(false);
+        userRepository.save(user);
+
+        // send notification email
+        NotificationDTO notificationDTO = NotificationDTO.builder()
+                .recipient(user.getEmail())
+                .subject("Account Deactivation")
+                .body("Dear " + user.getName() + ",\n\n" +
+                        "Your account has been successfully deactivated. If this was a mistake, please contact support.\n\n" +
+                        "Best regards,\n" +
+                        "FoodApp Team")
+                .build();
+        notificationService.sendEmail(notificationDTO);
+
+        return Response.builder()
+                .statusCode(HttpStatus.OK.value())
+                .message("Own account deactivated successfully")
+                .build();
     }
 }
