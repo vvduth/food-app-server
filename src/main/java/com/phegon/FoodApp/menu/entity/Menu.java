@@ -5,7 +5,10 @@ import com.phegon.FoodApp.category.entity.Category;
 import com.phegon.FoodApp.order.entity.OrderItem;
 import com.phegon.FoodApp.review.entity.Review;
 import jakarta.persistence.*;
+import lombok.AllArgsConstructor;
+import lombok.Builder;
 import lombok.Data;
+import lombok.NoArgsConstructor;
 
 import java.math.BigDecimal;
 import java.util.List;
@@ -13,6 +16,9 @@ import java.util.List;
 @Entity
 @Data
 @Table(name = "menus")
+@Builder
+@AllArgsConstructor
+@NoArgsConstructor
 public class Menu {
 
     @Id
