@@ -19,6 +19,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.math.BigDecimal;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
@@ -49,6 +50,7 @@ public class CartServiceImpl implements CartService{
                 .orElseGet(() -> {
                     Cart newCart = new Cart();
                     newCart.setUser(user);
+                    newCart.setItems(new ArrayList<>());
                     return cartRepository.save(newCart);
                 });
         // check if the item already exists in the cart
@@ -190,11 +192,28 @@ public class CartServiceImpl implements CartService{
         if (cartDTO.getCartItems() != null) {
             cartDTO.getCartItems().forEach(cartItem -> cartItem.getMenu().setReviews(null));
         }
-        return null;
+        return  Response.<CartDTO>builder()
+                .statusCode(HttpStatus.OK.value())
+                .message("Shopping cart retrieved successfully")
+                .data(cartDTO)
+                .build();
     }
 
     @Override
     public Response<?> clearShoppingCart() {
-        return null;
+
+        log.info("Clearing shopping cart for current user");
+        User user = userService.getCurrentLoggedInUser();
+        Cart cart = cartRepository.findByUser_Id(user.getId())
+                .orElseThrow(() -> new NotFoundException("Cart not found for user with id: " + user.getId()));
+
+        cartItemRepository.deleteAll(cart.getItems());
+
+        cart.getItems().clear();
+        cartRepository.save(cart); // Save the cart to persist changes
+        return Response.builder()
+                .statusCode(HttpStatus.OK.value())
+                .message("Shopping cart cleared successfully")
+                .build();
     }
 }
