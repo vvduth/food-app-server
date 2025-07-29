@@ -12,6 +12,7 @@ import com.phegon.FoodApp.enums.OrderStatus;
 import com.phegon.FoodApp.enums.PaymentStatus;
 import com.phegon.FoodApp.exceptions.BadRequestException;
 import com.phegon.FoodApp.exceptions.NotFoundException;
+import com.phegon.FoodApp.menu.dtos.MenuDTO;
 import com.phegon.FoodApp.order.dtos.OrderDTO;
 import com.phegon.FoodApp.order.dtos.OrderItemDTO;
 import com.phegon.FoodApp.order.entity.Order;
@@ -22,6 +23,7 @@ import com.phegon.FoodApp.response.Response;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.aspectj.weaver.ast.Or;
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.domain.Page;
@@ -160,22 +162,70 @@ public class OrderServiceImpl implements OrderService{
 
     @Override
     public Response<List<OrderDTO>> getOrdersOfUser() {
-        return null;
+        log.info("Fetching orders for the current user");
+
+        User customer = userService.getCurrentLoggedInUser();
+        List<Order> orders = orderRepository.findByUserOrderByOrderDateDesc(customer);
+
+        List<OrderDTO> orderDTOs = orders.stream()
+                .map(order -> modelMapper.map(order, OrderDTO.class))
+                .toList();
+
+        orderDTOs.forEach(orderItem -> {
+            orderItem.setUser(null);
+            orderItem.getOrderItems().forEach(item -> item.getMenu().setReviews(null)); // Avoid loading reviews in DTO
+        });
+        return Response.<List<OrderDTO>>builder()
+                .statusCode(HttpStatus.OK.value())
+                .message("Orders fetched successfully")
+                .data(orderDTOs)
+                .build();
     }
 
     @Override
     public Response<OrderItemDTO> getOrderItemById(Long orderItemId) {
-        return null;
+        log.info("Fetching order item by ID: {}", orderItemId);
+
+        OrderItem orderItem = orderItemRepository.findById(orderItemId)
+                .orElseThrow(() -> new NotFoundException("Order item not found with ID: " + orderItemId));
+
+        OrderItemDTO orderItemDTO = modelMapper.map(orderItem, OrderItemDTO.class);
+        orderItemDTO.setMenu(modelMapper.map(orderItem.getMenu(), MenuDTO.class));
+
+        return Response.<OrderItemDTO>builder()
+                .statusCode(HttpStatus.OK.value())
+                .message("Order item fetched successfully")
+                .data(orderItemDTO)
+                .build();
     }
 
     @Override
     public Response<OrderDTO> updateOrderStatus(OrderDTO orderDTO) {
-        return null;
+        log.info("Updating order status for order ID: {}", orderDTO.getId());
+
+        Order order = orderRepository.findById(orderDTO.getId())
+                .orElseThrow(() -> new NotFoundException("Order not found with ID: " + orderDTO.getId()));
+
+       OrderStatus newStatus = orderDTO.getOrderStatus();
+       order.setOrderStatus(newStatus);
+       orderRepository.save(order);
+
+        return Response.<OrderDTO>builder()
+                .statusCode(HttpStatus.OK.value())
+                .message("Order status updated successfully")
+                .build();
     }
 
     @Override
     public Response<Long> countUniqueCustomers() {
-        return null;
+        log.info("Counting unique customers who have placed orders");
+
+        long uniqueCustomerCount = orderRepository.countDistinctUsers();
+        return Response.<Long>builder()
+                .statusCode(HttpStatus.OK.value())
+                .message("Unique customer count fetched successfully")
+                .data(uniqueCustomerCount)
+                .build();
     }
 
 
