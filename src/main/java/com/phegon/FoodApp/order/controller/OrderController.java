@@ -26,8 +26,8 @@ public class OrderController {
         return ResponseEntity.ok(orderService.placeOrderFromCart());
     }
 
-    @GetMapping("{id}")
-    public ResponseEntity<Response<?>> getOrderById(Long id) {
+    @GetMapping("/{id}")
+    public ResponseEntity<Response<?>> getOrderById(@PathVariable Long id) {
         return ResponseEntity.ok(orderService.getOrderById(id));
     }
 
@@ -50,7 +50,13 @@ public class OrderController {
         return ResponseEntity.ok(orderService.getAllOrders(orderStatus,page, size));
     }
 
-    @PutMapping("/unique-customers")
+    @PutMapping("/update")
+    @PreAuthorize("hasAuthority('ADMIN')")
+    public ResponseEntity<Response<OrderDTO>> updateOrderStatus(@RequestBody OrderDTO orderDTO) {
+        return ResponseEntity.ok(orderService.updateOrderStatus(orderDTO));
+    }
+
+    @GetMapping("/unique-customers")
     @PreAuthorize("hasAuthority('ADMIN')")
     public ResponseEntity<Response<Long>> countUniqueCustomers() {
         return ResponseEntity.ok(orderService.countUniqueCustomers());

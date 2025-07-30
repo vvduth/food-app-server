@@ -32,6 +32,7 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import org.thymeleaf.TemplateEngine;
 import org.thymeleaf.context.Context;
 
@@ -61,6 +62,7 @@ public class OrderServiceImpl implements OrderService{
     @Value("${base.payment.link}")
     private String basePaymentLink;
 
+    @Transactional
     @Override
     public Response<?> placeOrderFromCart() {
         log.info("Placing order from cart...");
