@@ -38,7 +38,7 @@ public class SecurityFilter {
                                 .authenticationEntryPoint(customAuthenticationEntryPoint)
 
                 ).authorizeHttpRequests(req-> req.requestMatchers("/api/v1/auth/**", "/api/v1/categories/**",
-                                "/api/v1/menu/**", "/api/v1/reviews/**","/api/v1/aws/upload",
+                                "/api/v1/menus/**", "/api/v1/reviews/**","/api/v1/aws/upload",
                                 "/api/v1/roles/**", "/api/v1/reviews/**")
                         .permitAll()
                         .anyRequest().authenticated())

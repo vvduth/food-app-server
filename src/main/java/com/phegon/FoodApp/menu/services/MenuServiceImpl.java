@@ -128,7 +128,11 @@ public class MenuServiceImpl implements MenuService {
             menuDTO.getReviews().sort(Comparator.comparing(ReviewDTO::getId).reversed());
         }
 
-        return null;
+        return Response.<MenuDTO>builder()
+                .statusCode(HttpStatus.OK.value())
+                .message("Menu fetched successfully")
+                .data(menuDTO)
+                .build();
     }
 
     @Override
