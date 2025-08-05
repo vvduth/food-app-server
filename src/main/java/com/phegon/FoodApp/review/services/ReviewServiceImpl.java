@@ -109,11 +109,30 @@ public class ReviewServiceImpl implements ReviewService {
 
     @Override
     public Response<List<ReviewDTO>> getReviewsForMenu(Long restaurantId) {
-        return null;
+        log.info("Fetching reviews for menu with ID: {}", restaurantId);
+
+        List<Review> reviews = reviewRepository.findByMenuIdOrderByIdDesc(restaurantId);
+
+        List<ReviewDTO> reviewDTOs = reviews.stream()
+                .map(review -> modelMapper.map(review, ReviewDTO.class))
+                .toList();
+
+        return Response.<List<ReviewDTO>>builder()
+                .statusCode(HttpStatus.OK.value())
+                .message("Reviews fetched successfully.")
+                .data(reviewDTOs)
+                .build();
     }
 
     @Override
     public Response<Double> getAverageRating(Long menuId) {
-        return null;
+        log.info("Calculating average rating for menu with ID: {}", menuId);
+        Double averageRating = reviewRepository.calculateAverageRatingByMenuId(menuId);
+
+        return Response.<Double>builder()
+                .statusCode(HttpStatus.OK.value())
+                .message("Average rating calculated successfully.")
+                .data(averageRating != null ? averageRating : 0.0)
+                .build();
     }
 }
