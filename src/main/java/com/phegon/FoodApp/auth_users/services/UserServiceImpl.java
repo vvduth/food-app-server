@@ -82,15 +82,17 @@ public class UserServiceImpl implements UserService{
 
         // check if new image file was provided
         if (imageFile != null && !imageFile.isEmpty()) {
-            // delete old image from S3 if ti exists
-            if (profileUrl != null  && !profileUrl.isEmpty()) {
+            // Delete the old image from S3 if it exists
+            if (profileUrl != null && !profileUrl.isEmpty()) {
                 String keyName = profileUrl.substring(profileUrl.lastIndexOf("/") + 1);
-                awss3Service.deleteFile("profile/"+ keyName);
-                log.info("Deleted old profile image from S3: {}", keyName);
+                awss3Service.deleteFile("profile/" + keyName);
+
+                log.info("Deleted old profile image from s3");
             }
-            // upload new image to S3
+            //upload new image
             String imageName = UUID.randomUUID().toString() + "_" + imageFile.getOriginalFilename();
             URL newImageUrl = awss3Service.uploadFile("profile/" + imageName, imageFile);
+
             user.setProfileUrl(newImageUrl.toString());
         }
 
@@ -102,7 +104,7 @@ public class UserServiceImpl implements UserService{
             user.setPhoneNumber(userDTO.getPhoneNumber());
         }
         if (userDTO.getAddress() != null) {
-            user.setEmail(userDTO.getAddress());
+            user.setAddress(userDTO.getAddress());
         }
         if (userDTO.getPassword() != null) {
             user.setPassword(passwordEncoder.encode(userDTO.getPassword()));

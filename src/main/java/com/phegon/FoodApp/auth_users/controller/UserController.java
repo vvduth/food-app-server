@@ -39,4 +39,9 @@ public class UserController {
         return ResponseEntity.ok(userService.updateOwnAccount(userDTO));
     }
 
+    @DeleteMapping("/deactivate")
+    public ResponseEntity<Response<?>> deactivateOwnAccount() {
+        return ResponseEntity.ok(userService.deactivateOwnAccount());
+    }
+
 }
