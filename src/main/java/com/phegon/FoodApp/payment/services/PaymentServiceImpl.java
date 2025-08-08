@@ -103,12 +103,15 @@ public class PaymentServiceImpl implements PaymentService {
         Order order = orderRepository.findById(orderId)
                 .orElseThrow(() -> new RuntimeException("Order not found with ID: " + orderId));
 
+        //  Build payment entity to save
         Payment payment = new Payment();
         payment.setPaymentGateway(PaymentGateway.STRIPE);
         payment.setAmount(paymentDTO.getAmount());
         payment.setTransactionId(paymentDTO.getTransactionId());
         payment.setPaymentStatus(paymentDTO.isSuccess() ? PaymentStatus.COMPLETED : PaymentStatus.FAILED);
+        payment.setPaymentDate(LocalDateTime.now());
         payment.setOrder(order);
+        payment.setUser(order.getUser());
 
         if (!paymentDTO.isSuccess()) {
             payment.setFailureReason(paymentDTO.getFailureReason());

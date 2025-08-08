@@ -28,7 +28,7 @@ public class PaymentController {
         paymentService.updatePaymentForOrder(paymentRequest);
     }
 
-    @PostMapping("/all")
+    @GetMapping("/all")
     @PreAuthorize("hasAuthority('ADMIN')")
     public ResponseEntity<Response<List<PaymentDTO>>> getAllPayments() {
         Response<List<PaymentDTO>> response = paymentService.getAllPayments();
